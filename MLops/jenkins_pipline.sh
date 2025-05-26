@@ -1,7 +1,7 @@
 #№1. download
-python3 -m venv ./my_env #создать виртуальное окружение в папку 
-. ./my_env/bin/activate   #активировать виртуальное окружение
-cd ./MLOPS/lab3		   #перейти в директорию ./MLOPS/lab3	
+python3 -m venv ./my_env
+. ./my_env/bin/activate
+cd ./MLops
 python3 -m ensurepip --upgrade
 pip3 install setuptools
 pip3 install -r requirements.txt    #установить пакеты python
@@ -12,14 +12,14 @@ python3 download.py    #запустить python script
 echo "Start train model"
 cd /var/lib/jenkins/workspace/download/
 . ./my_env/bin/activate   #активировать виртуальное окружение
-cd ./MLOPS/lab3		   #перейти в директорию ./MLOPS/pwd
-python3 train_model.py > best_model.txt #обучение модели запись лога в файл best_model
+cd ./MLops		   #перейти в директорию ./MLOPS/pwd
+python3 train_model.py > best_model.txt #обучение модели запись лога в файл
 #------------------------
 
 #3. deploy 
 cd /var/lib/jenkins/workspace/download/
 . ./my_env/bin/activate   #активировать виртуальное окружение
-cd ./MLOPS/lab3		   #перейти в директорию ./MLOPS/lab3
+cd ./MLops		   #перейти в директорию ./MLops
 export BUILD_ID=dontKillMe            #параметры для jenkins чтобы не убивать фоновый процесс для mlflow сервиса
 export JENKINS_NODE_COOKIE=dontKillMe #параметры для jenkins чтобы не убивать фоновый процесс для mlflow сервиса
 path_model=$(cat best_model.txt) #прочитать путь из файла в bash переменную 
@@ -27,8 +27,11 @@ mlflow models serve -m $path_model -p 5003 --no-conda & #запуск mlflow с�
 #------------------------
 
 #4. healthy (status service)
-curl http://127.0.0.1:5003/invocations -H"Content-Type:application/json"  --data '{"inputs": [[ -1.275938045, -1.2340347 , -1.41327673,  0.76150439,  2.20097247, -0.410937195,  0.58931542,  0.1135538,  0.58931542]]}'
-
+curl -X POST http://127.0.0.1:5003/invocations \
+     -H "Content-Type: application/json" \
+     -d '{
+           "inputs": [[3, 4.0, 1.0, 3.0, 1.0, 109, 90, 9980.0]]
+         }'
 
 #Pipeline - для объедения задач в последовательный конвеер
 #pipeline_cars
