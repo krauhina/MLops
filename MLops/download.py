@@ -3,7 +3,7 @@ from sklearn.preprocessing import OrdinalEncoder
 
 
 def download_data():
-    return pd.read_csv("new_car_price", index_col=0)
+    return pd.read_csv("new_car_price.csv", index_col=0)
 
 
 def clear_data(file_name):
